@@ -1,19 +1,13 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from "react";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-    </View>
-  );
-}
+import { Container, Title } from "./styles";
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+interface AppProps {}
+
+const App = ({}: AppProps): JSX.Element => (
+  <Container>
+    <Title>App</Title>
+  </Container>
+);
+
+export default App;
