@@ -31,3 +31,8 @@ export const setActiveAppointmentId = (id: string): Action => ({
   type: "SET_ACTIVE_APPOINTMENTID",
   data: id
 });
+
+export const setAvailabilityFilter = (): Action => ({
+  type: "SET_AVAILABILITY_FILTER",
+  data: null
+});

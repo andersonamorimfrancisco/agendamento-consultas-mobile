@@ -5,6 +5,7 @@ const initialState: State = {
   activeAppointmentId: "",
   activeWeekDay: 0,
   activeWeek: 0,
+  availabilityFilter: 0,
   appointments: [],
   patients: []
 };
@@ -39,6 +40,13 @@ const reducer = (state = initialState, action: Action) => {
       return { ...state, activeAppointmentId: "" };
     }
     return { ...state, activeAppointmentId: action.data };
+  }
+
+  if (action.type === "SET_AVAILABILITY_FILTER") {
+    if (state.availabilityFilter > 1) {
+      return { ...state, availabilityFilter: 0 };
+    }
+    return { ...state, availabilityFilter: state.availabilityFilter + 1 };
   }
 
   //=============================================================

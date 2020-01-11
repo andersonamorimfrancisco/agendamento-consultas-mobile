@@ -1,14 +1,43 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
 import { ScrollView, Button } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import api from "../../services";
 import * as actions from "../../store/actions";
-import RNPickerSelect from "react-native-picker-select";
-import { State, Patient } from "../../types";
+import { State, Patient, Appointment } from "../../types";
 import * as Styles from "./styles";
 import { Dispatch } from "redux";
 
+import AppointmentBody from "../../components/AppointmentBody";
+import AppointmentAddPatient from "../../components/AppointmentAddPatient";
+import AppointmentDetail from "../../components/AppointmentDetail";
+import FilterBar from "../../components/FilterBar";
+
 interface MainProps {}
+
+const normalizeAvailabilityFilter = (filter: number) => {
+  if (filter === 1) {
+    return "Ocupados";
+  }
+  if (filter === 2) {
+    return "Livres";
+  }
+  return "Todos";
+};
+
+const filterAppointmentAvailability = (
+  appointment: Appointment,
+  filter: number
+) => {
+  if (filter === 0) {
+    return appointment;
+  }
+  if (filter === 1 && appointment.patient) {
+    return appointment;
+  }
+  if (filter === 2 && !appointment.patient) {
+    return appointment;
+  }
+};
 
 const updateAppointmentList = (dispatch: Dispatch, week: number) =>
   api
@@ -16,10 +45,17 @@ const updateAppointmentList = (dispatch: Dispatch, week: number) =>
     .then(response => response.data)
     .then(data => dispatch(actions.updateAppointmentList(data)));
 
+const updatePatientList = (dispatch: Dispatch) =>
+  api
+    .get("/patient/list")
+    .then(response => response.data)
+    .then(data => dispatch(actions.updatePatientList(data)));
+
 const removeAppointmentPatient = (appointmentId: string) =>
   api.post("/appointment/removepatient", { appointmentId });
 
-const normalizeHour = (hour: number) => (hour > 9 ? ` ${hour}:00` : `0${hour}:00`);
+const normalizeHour = (hour: number) =>
+  hour > 9 ? ` ${hour}:00` : `0${hour}:00`;
 
 const normalizePatient = (patient: Patient) => (patient ? patient.name : "");
 
@@ -30,10 +66,7 @@ const Main = ({}: MainProps): JSX.Element => {
   //
   useEffect(() => {
     console.log("useEffect");
-    api
-      .get("/patient/list")
-      .then(response => response.data)
-      .then(data => dispatch(actions.updatePatientList(data)))
+    updatePatientList(dispatch)
       .then(() => {
         const date = new Date();
         return api.post("/appointment/list", {
@@ -55,57 +88,82 @@ const Main = ({}: MainProps): JSX.Element => {
   //
   return (
     <Styles.Container>
-      <Styles.Title>{`week: ${state.activeWeek}`}</Styles.Title>
-      <Styles.Title>{`weekDay: ${state.activeWeekDay}`}</Styles.Title>
-
+      <Styles.Header>
+        <Styles.Title>{`week: ${state.activeWeek}`}</Styles.Title>
+        <Styles.Title>{`weekDay: ${state.activeWeekDay}`}</Styles.Title>
+      </Styles.Header>
+      <Styles.Filter>
+        <FilterBar
+          label1={normalizeAvailabilityFilter(state.availabilityFilter)}
+          onClick1={() => {
+            dispatch(actions.setAvailabilityFilter());
+          }}
+        />
+      </Styles.Filter>
       <ScrollView>
         <Styles.AppointmentList>
           {state.appointments
             .filter(appointment => appointment.weekDay === state.activeWeekDay)
+            .filter(appointment =>
+              filterAppointmentAvailability(
+                appointment,
+                state.availabilityFilter
+              )
+            )
             .map(appointment => (
               <Styles.Appointment key={appointment._id}>
-                <Styles.AppointmentBody
-                  onPress={() => dispatch(actions.setActiveAppointmentId(appointment._id))}
-                >
-                  <Styles.AppointmentHour>{normalizeHour(appointment.hour)}</Styles.AppointmentHour>
-                  <Styles.AppointmentPatient>
-                    {normalizePatient(appointment.patient)} {appointment.date}
-                  </Styles.AppointmentPatient>
-                </Styles.AppointmentBody>
+                <AppointmentBody
+                  hour={normalizeHour(appointment.hour)}
+                  patient={normalizePatient(appointment.patient)}
+                  onPress={() =>
+                    dispatch(actions.setActiveAppointmentId(appointment._id))
+                  }
+                />
+
                 {state.activeAppointmentId !== appointment._id ? null : (
                   <Styles.AppointmentDetail>
                     {!appointment.patient ? (
-                      <Styles.AppointmentDetailAdd>
-                        <Styles.SelectContainer>
-                          <RNPickerSelect
-                            onValueChange={value =>
-                              api
-                                .post("/appointment/setpatient", {
-                                  appointmentId: state.activeAppointmentId,
-                                  patientId: value
-                                })
-                                .then(() => updateAppointmentList(dispatch, state.activeWeek))
-                                .catch(err => console.log(err))
-                            }
-                            items={state.patients.map(patient => ({
-                              label: patient.name,
-                              value: patient._id
-                            }))}
-                          />
-                        </Styles.SelectContainer>
-                        <Styles.AddButton>
-                          <Styles.AddButtonText>+</Styles.AddButtonText>
-                        </Styles.AddButton>
-                      </Styles.AppointmentDetailAdd>
+                      <>
+                        <AppointmentAddPatient
+                          onSelectorChange={patientId =>
+                            api
+                              .post("/appointment/setpatient", {
+                                appointmentId: state.activeAppointmentId,
+                                patientId: patientId
+                              })
+                              .then(() =>
+                                updateAppointmentList(
+                                  dispatch,
+                                  state.activeWeek
+                                )
+                              )
+                              .catch(err => console.log(err))
+                          }
+                          selectorItens={state.patients.map(patient => ({
+                            label: patient.name,
+                            value: patient._id
+                          }))}
+                        />
+                        <Styles.AppointmentDetailCreate>
+                          <Styles.AppointmentDetailCreateText>
+                            Ok
+                          </Styles.AppointmentDetailCreateText>
+                        </Styles.AppointmentDetailCreate>
+                      </>
                     ) : (
-                      <Button
-                        title={"Remover"}
-                        onPress={() => {
-                          removeAppointmentPatient(state.activeAppointmentId).then(() =>
-                            updateAppointmentList(dispatch, state.activeWeek)
-                          );
-                        }}
-                      />
+                      <>
+                        <AppointmentDetail appointment={appointment} />
+                        <Button
+                          title={"Remover"}
+                          onPress={() => {
+                            removeAppointmentPatient(
+                              state.activeAppointmentId
+                            ).then(() =>
+                              updateAppointmentList(dispatch, state.activeWeek)
+                            );
+                          }}
+                        />
+                      </>
                     )}
                   </Styles.AppointmentDetail>
                 )}

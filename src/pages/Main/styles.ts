@@ -6,45 +6,23 @@ export const Container = styled.View`
 `;
 export const Title = styled.Text``;
 
+export const Header = styled.View`
+  background-color: #34495e;
+`;
+
+export const Filter = styled.View``;
+
 export const AppointmentList = styled.View`
-  padding: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
 `;
 
-export const Appointment = styled.View``;
-
-export const AppointmentBody = styled.TouchableOpacity`
+export const Appointment = styled.View`
   margin-top: 10px;
-  flex-direction: row;
-  border: 1px solid lightgrey;
-`;
-
-export const AppointmentHour = styled.Text`
-  border-right-width: 1px;
-  border-right-color: lightgrey;
-  padding: 20px;
-`;
-
-export const AppointmentPatient = styled.Text`
-  padding: 20px;
 `;
 
 export const AppointmentDetail = styled.View``;
 
-export const AppointmentDetailAdd = styled.View`
-  flex-direction: row;
-`;
+export const AppointmentDetailCreate = styled.View``;
 
-export const SelectContainer = styled.View`
-  width: 80%;
-  border: 1px solid lightgrey;
-`;
-
-export const AddButton = styled.TouchableOpacity`
-  border: 1px solid lightgrey;
-  align-items: center;
-  justify-content: center;
-  width: 20%;
-`;
-export const AddButtonText = styled.Text`
-  font-size: 20px;
-`;
+export const AppointmentDetailCreateText = styled.Text``;

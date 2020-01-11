@@ -27,6 +27,7 @@ export interface State {
   activeWeek: number;
   activeWeekDay: number;
   appointments: Appointment[];
+  availabilityFilter: number;
   patients: Patient[];
 }
 export interface Action {
