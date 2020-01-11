@@ -57,18 +57,7 @@ const Main = ({}: MainProps): JSX.Element => {
     <Styles.Container>
       <Styles.Title>{`week: ${state.activeWeek}`}</Styles.Title>
       <Styles.Title>{`weekDay: ${state.activeWeekDay}`}</Styles.Title>
-      <Button
-        title={"-"}
-        onPress={() => {
-          dispatch(actions.setActiveWeekDay(state.activeWeekDay - 1));
-        }}
-      />
-      <Button
-        title={"+"}
-        onPress={() => {
-          dispatch(actions.setActiveWeekDay(state.activeWeekDay + 1));
-        }}
-      />
+
       <ScrollView>
         <Styles.AppointmentList>
           {state.appointments
@@ -86,21 +75,28 @@ const Main = ({}: MainProps): JSX.Element => {
                 {state.activeAppointmentId !== appointment._id ? null : (
                   <Styles.AppointmentDetail>
                     {!appointment.patient ? (
-                      <RNPickerSelect
-                        onValueChange={value =>
-                          api
-                            .post("/appointment/setpatient", {
-                              appointmentId: state.activeAppointmentId,
-                              patientId: value
-                            })
-                            .then(() => updateAppointmentList(dispatch, state.activeWeek))
-                            .catch(err => console.log(err))
-                        }
-                        items={state.patients.map(patient => ({
-                          label: patient.name,
-                          value: patient._id
-                        }))}
-                      />
+                      <Styles.AppointmentDetailAdd>
+                        <Styles.SelectContainer>
+                          <RNPickerSelect
+                            onValueChange={value =>
+                              api
+                                .post("/appointment/setpatient", {
+                                  appointmentId: state.activeAppointmentId,
+                                  patientId: value
+                                })
+                                .then(() => updateAppointmentList(dispatch, state.activeWeek))
+                                .catch(err => console.log(err))
+                            }
+                            items={state.patients.map(patient => ({
+                              label: patient.name,
+                              value: patient._id
+                            }))}
+                          />
+                        </Styles.SelectContainer>
+                        <Styles.AddButton>
+                          <Styles.AddButtonText>+</Styles.AddButtonText>
+                        </Styles.AddButton>
+                      </Styles.AppointmentDetailAdd>
                     ) : (
                       <Button
                         title={"Remover"}
