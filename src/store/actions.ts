@@ -19,6 +19,14 @@ export const setActiveWeekDay = (weekDay: number): Action => ({
   data: weekDay
 });
 
+export const setActiveWeekAndWeekDay = (
+  week: number,
+  weekDay: number
+): Action => ({
+  type: "SET_ACTIVE_WEEK_AND_WEEKDAY",
+  data: { week, weekDay }
+});
+
 export const setActiveAppointmentId = (id: string): Action => ({
   type: "SET_ACTIVE_APPOINTMENTID",
   data: id
