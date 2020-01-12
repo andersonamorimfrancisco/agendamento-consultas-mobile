@@ -19,7 +19,7 @@ interface MainProps {}
 
 const updateAppointmentList = (dispatch: Dispatch, week: number) =>
   api
-    .post("/appointment/list", { week })
+    .post("/appointment/list", {})
     .then(response => response.data)
     .then(data => dispatch(actions.updateAppointmentList(data)));
 
@@ -38,7 +38,6 @@ const Main = ({}: MainProps): JSX.Element => {
   const dispatch = useDispatch();
   //
   useEffect(() => {
-    console.log("useEffect");
     updatePatientList(dispatch)
       .then(() => {
         const date = new Date();
@@ -73,8 +72,14 @@ const Main = ({}: MainProps): JSX.Element => {
         }}
       />
       <WeekBar
+        onPress={weekDay => dispatch(actions.setActiveWeekDay(weekDay))}
+        activeWeekDay={state.activeWeekDay}
         initialDay={state.appointments.reduce((prev, curr) => {
-          if (curr.weekDay === 0 && curr.hour === 0) {
+          if (
+            curr.week === state.activeWeek &&
+            curr.weekDay === 0 &&
+            curr.hour === 0
+          ) {
             return curr.day;
           }
           return prev;
@@ -83,6 +88,7 @@ const Main = ({}: MainProps): JSX.Element => {
       <ScrollView>
         <Styles.AppointmentList>
           {state.appointments
+            .filter(appointment => appointment.week === state.activeWeek)
             .filter(appointment => appointment.weekDay === state.activeWeekDay)
             .filter(appointment =>
               utils.filterAppointmentAvailability(

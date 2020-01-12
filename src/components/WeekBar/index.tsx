@@ -3,17 +3,26 @@ import * as Styles from "./styles";
 
 interface WeekBarProps {
   initialDay: number;
+  activeWeekDay: number;
+  onPress: Function;
 }
 
-const WeekBar = ({ initialDay }: WeekBarProps): JSX.Element => (
+const WeekBar = ({
+  initialDay,
+  activeWeekDay,
+  onPress
+}: WeekBarProps): JSX.Element => (
   <Styles.Container>
-    <Styles.Title>Dom {initialDay}</Styles.Title>
-    <Styles.Title>Seg {initialDay + 1}</Styles.Title>
-    <Styles.Title>Ter {initialDay + 2}</Styles.Title>
-    <Styles.Title>Qua {initialDay + 3}</Styles.Title>
-    <Styles.Title>Qui {initialDay + 4}</Styles.Title>
-    <Styles.Title>Sex {initialDay + 5}</Styles.Title>
-    <Styles.Title>Sab {initialDay + 6}</Styles.Title>
+    {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"].map((weekDay, index) => (
+      <Styles.WeekDay key={weekDay} onPress={() => onPress(index)}>
+        <Styles.Text>{weekDay}</Styles.Text>
+        {index === activeWeekDay ? (
+          <Styles.ActiveNumber>{initialDay + index}</Styles.ActiveNumber>
+        ) : (
+          <Styles.Number>{initialDay + index}</Styles.Number>
+        )}
+      </Styles.WeekDay>
+    ))}
   </Styles.Container>
 );
 
