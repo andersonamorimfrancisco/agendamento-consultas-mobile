@@ -1,43 +1,21 @@
 import React, { useEffect } from "react";
 import { ScrollView, Button } from "react-native";
+import { Dispatch } from "redux";
 import { useSelector, useDispatch } from "react-redux";
 import api from "../../services";
 import * as actions from "../../store/actions";
-import { State, Patient, Appointment } from "../../types";
 import * as Styles from "./styles";
-import { Dispatch } from "redux";
+import { State } from "../../types";
 
 import AppointmentBody from "../../components/AppointmentBody";
 import AppointmentAddPatient from "../../components/AppointmentAddPatient";
 import AppointmentDetail from "../../components/AppointmentDetail";
 import FilterBar from "../../components/FilterBar";
+import WeekBar from "../../components/WeekBar";
+
+import utils from "../../utils";
 
 interface MainProps {}
-
-const normalizeAvailabilityFilter = (filter: number) => {
-  if (filter === 1) {
-    return "Ocupados";
-  }
-  if (filter === 2) {
-    return "Livres";
-  }
-  return "Todos";
-};
-
-const filterAppointmentAvailability = (
-  appointment: Appointment,
-  filter: number
-) => {
-  if (filter === 0) {
-    return appointment;
-  }
-  if (filter === 1 && appointment.patient) {
-    return appointment;
-  }
-  if (filter === 2 && !appointment.patient) {
-    return appointment;
-  }
-};
 
 const updateAppointmentList = (dispatch: Dispatch, week: number) =>
   api
@@ -53,11 +31,6 @@ const updatePatientList = (dispatch: Dispatch) =>
 
 const removeAppointmentPatient = (appointmentId: string) =>
   api.post("/appointment/removepatient", { appointmentId });
-
-const normalizeHour = (hour: number) =>
-  hour > 9 ? ` ${hour}:00` : `0${hour}:00`;
-
-const normalizePatient = (patient: Patient) => (patient ? patient.name : "");
 
 const Main = ({}: MainProps): JSX.Element => {
   //
@@ -92,20 +65,27 @@ const Main = ({}: MainProps): JSX.Element => {
         <Styles.Title>{`week: ${state.activeWeek}`}</Styles.Title>
         <Styles.Title>{`weekDay: ${state.activeWeekDay}`}</Styles.Title>
       </Styles.Header>
-      <Styles.Filter>
-        <FilterBar
-          label1={normalizeAvailabilityFilter(state.availabilityFilter)}
-          onClick1={() => {
-            dispatch(actions.setAvailabilityFilter());
-          }}
-        />
-      </Styles.Filter>
+
+      <FilterBar
+        label1={utils.normalizeAvailabilityFilter(state.availabilityFilter)}
+        onClick1={() => {
+          dispatch(actions.setAvailabilityFilter());
+        }}
+      />
+      <WeekBar
+        initialDay={state.appointments.reduce((prev, curr) => {
+          if (curr.weekDay === 0 && curr.hour === 0) {
+            return curr.day;
+          }
+          return prev;
+        }, 0)}
+      />
       <ScrollView>
         <Styles.AppointmentList>
           {state.appointments
             .filter(appointment => appointment.weekDay === state.activeWeekDay)
             .filter(appointment =>
-              filterAppointmentAvailability(
+              utils.filterAppointmentAvailability(
                 appointment,
                 state.availabilityFilter
               )
@@ -113,8 +93,8 @@ const Main = ({}: MainProps): JSX.Element => {
             .map(appointment => (
               <Styles.Appointment key={appointment._id}>
                 <AppointmentBody
-                  hour={normalizeHour(appointment.hour)}
-                  patient={normalizePatient(appointment.patient)}
+                  hour={utils.normalizeHour(appointment.hour)}
+                  patient={utils.normalizePatient(appointment.patient)}
                   onPress={() =>
                     dispatch(actions.setActiveAppointmentId(appointment._id))
                   }
