@@ -6,6 +6,17 @@ interface CreateAppointmentsList {
   currentDate: Date;
 }
 
+const creteBasicDate = (currentDate: Date) =>
+  new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    currentDate.getDate(),
+    0,
+    0,
+    0,
+    0
+  );
+
 const createAppointmentsList = ({
   initialHour,
   finalHour,
@@ -13,17 +24,15 @@ const createAppointmentsList = ({
 }: CreateAppointmentsList) => {
   return new Array(finalHour - initialHour).fill("").map(
     (item, index): Appointment => {
-      const date = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth(),
-        currentDate.getDate(),
-        0,
-        0,
-        0,
-        0
-      );
+      const date = creteBasicDate(currentDate);
       date.setHours(index + initialHour);
-      return { date };
+      return {
+        hour: date.getHours(),
+        day: date.getDate(),
+        month: date.getMonth(),
+        year: date.getFullYear(),
+        date: date.toTimeString()
+      };
     }
   );
 };

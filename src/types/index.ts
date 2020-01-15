@@ -1,5 +1,9 @@
 export interface Appointment {
-  date: Date;
+  date: string;
+  hour: number;
+  day: number;
+  month: number;
+  year: number;
 }
 export interface Patient {
   name: string;
@@ -13,6 +17,7 @@ export interface State {
   currentDate: Date;
   appointments: Appointment[];
 }
+
 export interface UPDATE_APPOINTMENT_LIST {
   type: "UPDATE_APPOINTMENT_LIST";
   data: Appointment[];

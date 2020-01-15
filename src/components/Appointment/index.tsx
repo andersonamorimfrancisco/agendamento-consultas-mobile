@@ -10,7 +10,7 @@ interface AppointmentProps {
 
 const Appointment = ({ data, patient }: AppointmentProps): JSX.Element => (
   <Styles.Container>
-    <Styles.Hour>{utils.normalizeHour(data.date.getHours())}</Styles.Hour>
+    <Styles.Hour>{utils.normalizeHour(data.hour)}</Styles.Hour>
     <Styles.PatientName>{utils.normalizePatient(patient)}</Styles.PatientName>
   </Styles.Container>
 );

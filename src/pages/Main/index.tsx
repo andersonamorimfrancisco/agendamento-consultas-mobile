@@ -1,31 +1,32 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { ScrollView } from "react-native";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import patients from "../../store/patients";
-import CurrentDayBar from "../../components/CurrentDate";
-import Appointment from "../../components/Appointment";
-import * as actions from "../../store/actions";
 import * as utils from "../../utils";
 import * as Styles from "./styles";
 import { State } from "../../types";
+
+import Appointment from "../../components/Appointment";
+import CurrentDayBar from "../../components/CurrentDayBar";
+import WeekBar from "../../components/WeekBar";
 
 interface MainProps {}
 
 const Main = ({}: MainProps): JSX.Element => {
   const state = useSelector<State, State>(state => state);
-  const dispatch = useDispatch();
-  const { initialHour, finalHour, currentDate, appointments } = state;
+  const { initialHour, finalHour, currentDate } = state;
 
   return (
     <Styles.Container>
-      <CurrentDayBar currentDay={currentDate} />
+      <CurrentDayBar currentDate={currentDate} />
+      <WeekBar currentDate={currentDate} />
       <ScrollView>
         <Styles.AppointmentList>
           {utils
             .createAppointmentsList({ initialHour, finalHour, currentDate })
             .map(appointment => (
               <Appointment
-                key={`${appointment.date.getHours()}}`}
+                key={`${appointment.hour}}`}
                 data={appointment}
                 patient={utils.filterPatient(patients, appointment)}
               />
