@@ -1,7 +1,12 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
 import Main from "./src/pages/Main";
+import { Provider } from "react-redux";
+import store from "./src/store";
 
 export default function App() {
-  return <Main />;
+  return (
+    <Provider store={store}>
+      <Main />
+    </Provider>
+  );
 }
